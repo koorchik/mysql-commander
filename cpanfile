@@ -5,3 +5,4 @@ requires 'Curses::UI';
 requires 'DBI';
 requires 'DBD::mysql';
 requires 'DBIx::Inspector';
+requires 'Text::Aligner';

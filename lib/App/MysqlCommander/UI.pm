@@ -7,6 +7,7 @@ with 'App::MysqlCommander::Role::PubSub';
 
 use Curses::UI;
 use Curses;
+use Curses::UI::Table;
 
 
 has 'cui' => ( 
@@ -46,55 +47,60 @@ sub _append_results_viewer {
 
     my $main_window = $self->cui->getobj('main_window');
 
-    my $values = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-    my $labels = {
-        1  => 'One       |One       |One       |One       |One       |One       |One       One       |One       ',   
-        3  => 'Three     |Three     |Three     |Three     |Three     |Three     |Three     Three     |Three     ', 
-        5  => 'Five      |Five      |Five      |Five      |Five      |Five      |Five      Five      |Five      ',  
-        7  => 'Seven     |Seven     |Seven     |Seven     |Seven     |Seven     |Seven     Seven     |Seven     ', 
-        9  => 'Nine      |Nine      |Nine      |Nine      |Nine      |Nine      |Nine      Nine      |Nine      ',  
-        2  => 'Two       |Two       |Two       |Two       |Two       |Two       |Two       Two       |Two       ',
-        4  => 'Four      |Four      |Four      |Four      |Four      |Four      |Four      Four      |Four      ',
-        6  => 'Six       |Six       |Six       |Six       |Six       |Six       |Six       Six       |Six       ',
-        8  => 'Eight     |Eight     |Eight     |Eight     |Eight     |Eight     |Eight     Eight     |Eight     ',
-        10 => 'Ten       |Ten       |Ten       |Ten       |Ten       |Ten       |Ten       Ten       |Ten       ',
-    };
-    
-    my $results_block =  $main_window->add( 
-       undef, 'Container',
+    my @columns = ({
+        -isid  => 1,
+        -key   => 'user_id',
+        -label => 'User ID'
+    }, 
+    {
+        -key   => 'first_name',
+        -label => 'First Name'
+    },
+    {
+        -key   => 'middle_name',
+        -label => 'Middle Name'
+    },
+    {
+        -key   => 'last_name',
+        -label => 'Last Name'
+    },
+    {
+        -key   => 'email',
+        -label => 'Email'
+    });
+
+    my @rows = ({
+        user_id     => 1,
+        first_name  => 'Vasya',
+        middle_name => 'Vaskin',
+        last_name   => 'Pupkin',
+        email       => 'vasya.email@mail.com'
+    },
+    {
+        user_id     => 2,
+        first_name  => 'Vasya2',
+        middle_name => 'Vaskin2',
+        last_name   => 'Pupkin2',
+        email       => 'vasya.email@mail.com'
+    },
+    {
+        user_id     => 3,
+        first_name  => 'Vasya3',
+        middle_name => 'Vaskin3',
+        last_name   => 'Pupkin3',
+        email       => 'vasya.email@mail.com'
+    });
+
+    my $results_table = $main_window->add( 
+       'results_table', 'Table',
         -y          => 7,
         -border     => 1,
         -title      => 'Results',
-        -vscrollbar => 1,
         -bg         => 'blue',
         -bbg        => 'blue',
         -fw         => 'white',
-        -onchange   => \&listbox_callback,
-    );
-    
-    my $results_table_header = $results_block->add( 
-       'results_table_header', 'Label',
-        -text       => $labels->{1},  
-        -border     => 0,
-        -width      => -1, 
-        -height     => 1,
-        -bg         => 'white',
-        -bbg        => 'white',
-        -fg         => 'blue',
-        -bold       => 1,
-    );
-
-    my $results_table = $results_block->add( 
-       'results_table', 'Listbox',
-        -y          => 1,
-        -values     => $values,
-        -labels     => $labels,
-        -vscrollbar => 1,
-        -border     => 0,
-        -bg         => 'blue',
-        -bbg        => 'blue',
-        -fw         => 'white',
-        -onchange   => \&listbox_callback,
+        -columns    => \@columns,
+        -rows       => \@rows
     );
 }
 
