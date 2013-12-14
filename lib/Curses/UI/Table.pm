@@ -49,7 +49,7 @@ sub new {
     my $self = $class->SUPER::new( %args );
     $self->{__table_width} = $self->width - 5; # Dirty hack (for prototyping only)  
     
-    $self->add( 
+    my $table_header = $self->add( 
        'table_header', 'Label',
         %args,
         -text       => $self->_make_header_text( $args{-columns} ),
@@ -57,11 +57,13 @@ sub new {
         -border     => 0,
         -width      => -1, 
         -height     => 1,
-        -bg         => 'white',
+        -bg         => 'magenta',
         -bbg        => 'white',
-        -fg         => 'black',
+        -fg         => 'white',
         -bold       => 1,
+        -focus      => 0,
     );
+    $table_header->focusable(0);
 
     $self->add( 
        'table_body', 'Listbox',
@@ -75,6 +77,10 @@ sub new {
         $self->_make_table_listbox($args{-rows}, $args{-columns})
     );
  
+    $self->onFocus(sub {
+        my $self = shift;
+        $self->getobj('table_body')->focus();
+    });
     return $self;
 }
 

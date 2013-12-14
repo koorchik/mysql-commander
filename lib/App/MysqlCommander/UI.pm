@@ -38,6 +38,7 @@ sub _compose_ui {
     $self->_append_main_window();
     $self->_append_sql_editor();
     $self->_append_results_viewer();
+    $self->_append_bindings_help();
     $self->_set_keyboard_bindings();
 }
 
@@ -100,7 +101,8 @@ sub _append_results_viewer {
         -bbg        => 'blue',
         -fw         => 'white',
         -columns    => \@columns,
-        -rows       => \@rows
+        -rows       => \@rows,
+        -padbottom  => 1,
     );
 }
 
@@ -160,8 +162,9 @@ sub _append_main_menu {
     my $menu = $self->cui->add(
         'main_menu', 'Menubar',
         -menu => \@menu,
-        -fg   => "white",
-        -bg   => 'blue',
+        -fg   => "black",
+        -bg   => 'cyan',
+        -bold => 1,
     );
 }
 
@@ -188,7 +191,7 @@ sub _append_sql_editor {
         -border   => 0,
         -bg       => 'white',
         -fg       => 'black',
-        -text     => "Here is some text\n" . "And some more"
+        -text     => "SELECT * FROM `table`",
     );
 
     $self->sql_editor($sql_editor);
@@ -197,7 +200,7 @@ sub _append_sql_editor {
         my $text = $self->sql_editor->text;
         #$self->trigger('sql_update', $text);
         $self->sql_editor->text('updated');
-    }, KEY_ENTER);
+    }, "\cr");
 
     $main_window->add(
         undef, 'Label',
@@ -219,6 +222,21 @@ sub _set_keyboard_bindings {
     }, "\cQ");
 }
 
+sub _append_bindings_help {
+    my $self = shift;
+    $self->cui->getobj('main_window')->add( 
+       'help', 'Label',
+        -text       => 'CTRL+R Execute query | CTRL+X Menu',  
+        -y          => -1,     
+        -border     => 0,
+        -width      => -1, 
+        -height     => 1,
+        -bg         => 'white',
+        -bbg        => 'white',
+        -fg         => 'black',
+        -bold       => 1,
+    );
+}
 sub _show_exit_dialog {
     my $self = shift;
 
