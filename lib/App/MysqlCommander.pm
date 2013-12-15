@@ -67,7 +67,7 @@ sub _build_ui {
 sub _build_dbh {
     my $self = shift;
 
-    my $dsn = "DBI:mysql:". $self->database ."=mysql;";
+    my $dsn = "DBI:mysql:database=". $self->database .";";
     my $dbh = DBI->connect($dsn, $self->user, $self->password, {RaiseError =>1});
     return $dbh;
 }
