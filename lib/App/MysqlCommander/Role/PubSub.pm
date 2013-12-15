@@ -11,7 +11,7 @@ sub trigger {
     my ($self, $event_name, $data) = @_;
     
     if ( $self->_pub_sub_events->{$event_name} ) {
-         $self->_pub_sub_events->{$event_name}->($data);
+         $self->_pub_sub_events->{$event_name}->($self, $data);
     }
 };
 

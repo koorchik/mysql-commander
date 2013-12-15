@@ -84,6 +84,20 @@ sub new {
     return $self;
 }
 
+sub update_data {
+    my ($self, $columns, $rows) = @_;
+
+
+    $self->getobj('table_header')->text(
+        $self->_make_header_text( $columns )
+    );
+
+    my %args = $self->_make_table_listbox($rows, $columns);
+
+    $self->getobj('table_body')->values($args{-values});
+    $self->getobj('table_body')->labels($args{-labels});
+}
+
 sub _make_header_text {
     my ( $self, $columns ) = @_;
     return '' unless @$columns;
@@ -96,13 +110,15 @@ sub _make_header_text {
 
 sub _make_table_listbox {
     my ( $self, $rows, $columns ) = @_;
-    
+    return ( -values => [], -labels => {} ) unless @$columns;
+
     my $col_width = int($self->{__table_width}/@$columns);
 
     my ($id_key) = map { $_->{-key} } grep { $_->{-isid} } @$columns;
     my @keys = map { $_->{-key} } @$columns;
     
     my ( @ids, %labels );
+    no warnings;
     foreach my $row ( @$rows ) {
         my $id = $row->{$id_key};
         

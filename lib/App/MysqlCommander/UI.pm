@@ -10,15 +10,28 @@ use Curses;
 use Curses::UI::Table;
 
 
-has 'cui' => ( 
-    'is'  => 'lazy',
-    'default' => sub { Curses::UI->new( -color_support => 1 ) }
+has cui => ( 
+    is      => 'lazy',
+    default => sub { Curses::UI->new( -color_support => 1 ) }
 );
 
-has 'sql_editor' => (
-    'is' => 'rw'
+has sql_editor => (
+    is => 'rw'
 );
 
+has results_table => (
+    is => 'rw'
+);
+
+has queries => (
+    is      => 'ro',
+    default => sub {+{
+        'databases'   => 'SHOW DATABASES',
+        'variables'   => 'SHOW VARIABLES',
+        'statictics'  => 'SHOW TABLE STATUS',
+        'processlist' => 'SHOW PROCESSLIST',
+    }}
+);
 
 sub run {
     my $self = shift;
@@ -30,6 +43,18 @@ sub run {
     $self->cui->mainloop();
 }
 
+sub redraw_results {
+
+}
+
+sub update_data {
+    my ($self, $data) = @_;
+     
+    my $rows = $data;
+    my $columns = $self->_make_columns_from_row( $rows->[0] );
+
+    $self->results_table->update_data($columns, $rows);
+}
 
 sub _compose_ui {
     my $self = shift;
@@ -104,6 +129,8 @@ sub _append_results_viewer {
         -rows       => \@rows,
         -padbottom  => 1,
     );
+
+    $self->results_table($results_table);
 }
 
 sub _append_main_menu {
@@ -113,15 +140,21 @@ sub _append_main_menu {
         -label   => 'Main', 
         -submenu => [ { 
             -label => 'Choose Database', 
-            -value => \&exit_dialog  
+            -value => sub {
+                $self->_execute_query('databases');
+            }  
         },
         { 
             -label => 'Settings', 
-            -value => \&exit_dialog  
+            -value => sub {
+                $self->_show_settings_dialog();
+            }
         },
         { 
             -label => 'Quit', 
-            -value => \&exit_dialog  
+            -value => sub {
+                $self->_show_exit_dialog();  
+            }
         } ]
     },
     { 
@@ -129,33 +162,21 @@ sub _append_main_menu {
         -submenu => [ 
         { 
             -label => 'Variables', 
-            -value => \&exit_dialog  
+            -value => sub {
+                $self->_execute_query('variables');
+            }  
         },
         { 
             -label => 'Statictics', 
-            -value => \&exit_dialog  
+            -value => sub {
+                $self->_execute_query('statictics');
+            }  
         },
         { 
             -label => 'Process list', 
-            -value => \&exit_dialog  
-        } ]
-    }, { 
-        -label   => 'About', 
-        -submenu => [ { 
-            -label => 'Choose Database ^Q', 
-            -value => \&exit_dialog  
-        },
-        { 
-            -label => 'Show status      ^Q', 
-            -value => \&exit_dialog  
-        },
-        { 
-            -label => 'Show variables  ^Q', 
-            -value => \&exit_dialog  
-        },
-        { 
-            -label => 'Show process list  ^Q', 
-            -value => \&exit_dialog  
+            -value => sub {
+                $self->_execute_query('processlist');
+            }
         } ]
     });
 
@@ -191,15 +212,14 @@ sub _append_sql_editor {
         -border   => 0,
         -bg       => 'white',
         -fg       => 'black',
-        -text     => "SELECT * FROM `table`",
+        -text     => "",
     );
 
     $self->sql_editor($sql_editor);
 
     $sql_editor->set_binding( sub {
-        my $text = $self->sql_editor->text;
-        #$self->trigger('sql_update', $text);
-        $self->sql_editor->text('updated');
+        my $query = $self->sql_editor->text;
+        $self->trigger('sql_update', $query);
     }, "\cr");
 
     $main_window->add(
@@ -226,7 +246,7 @@ sub _append_bindings_help {
     my $self = shift;
     $self->cui->getobj('main_window')->add( 
        'help', 'Label',
-        -text       => 'CTRL+R Execute query | CTRL+X Menu',  
+        -text       => 'CTRL+R Execute query | CTRL+X Menu | CTRL+Q Quit',  
         -y          => -1,     
         -border     => 0,
         -width      => -1, 
@@ -249,6 +269,35 @@ sub _show_exit_dialog {
     );
  
     exit(0) if $return;
+}
+
+sub _execute_query {
+    my ( $self, $query_name ) = @_;
+    my $query = $self->queries->{$query_name};
+
+    $self->sql_editor->text($query);
+    $self->sql_editor->pos(100);
+    $self->trigger('sql_update', $query);
+}
+
+sub _make_columns_from_row {
+    my ($self, $row) = @_;
+    return [] unless $row;
+
+    my @columns;
+    foreach my $key (sort keys %$row) {
+        push @columns, {
+            -isid  => 1,
+            -key   => $key,
+            -label => $key,
+        }
+    }
+
+    return \@columns;
+}
+
+sub _show_settings_dialog {
+
 }
 
 1;
