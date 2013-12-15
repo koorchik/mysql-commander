@@ -3,7 +3,7 @@ package App::MysqlCommander::UI;
 use Modern::Perl;
 use Moo;
 
-with 'App::MysqlCommander::Role::PubSub';
+with 'MooX::Role::PubSub';
 
 use Curses::UI;
 use Curses;

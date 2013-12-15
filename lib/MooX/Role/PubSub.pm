@@ -1,4 +1,4 @@
-package App::MysqlCommander::Role::PubSub;
+package MooX::Role::PubSub;
 
 use Moo::Role;
 
