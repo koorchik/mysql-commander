@@ -23,7 +23,7 @@ sub new {
     my $class = shift;
  
     my %userargs = @_;
-    # keys_to_lowercase(\%userargs);
+    keys_to_lowercase(\%userargs);
  
     my %args = (
         -parent    => undef,    # the parent window

@@ -57,7 +57,10 @@ sub _build_ui {
             $ui->update_data($data);
         } 
         catch {
-            warn $_;
+            s/.*selectall_arrayref failed://;
+            s/at line \d.*//;
+            s/at \/.*//;
+            $ui->show_error($_);
         };
     });
 
@@ -70,7 +73,8 @@ sub _build_dbh {
     my $dsn = "DBI:mysql:database=". $self->database .";";
     
     my $dbh = DBI->connect($dsn, $self->user, $self->password, {
-        RaiseError => 1,
+        RaiseError        => 1,
+        PrintError        => 0,
         mysql_enable_utf8 => 1
     });
     

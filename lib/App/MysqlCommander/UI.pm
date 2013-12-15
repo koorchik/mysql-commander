@@ -57,6 +57,18 @@ sub update_data {
     $self->results_table->update_data($columns, $rows);
 }
 
+sub show_error {
+    my ( $self, $message ) = @_;
+    $self->cui->dialog(
+        -title   => "Query error", 
+        -bg      => 'red',
+        -bbg     => 'red',
+        -fg      => 'white',
+        -bold    => 1,
+        -message => $message
+    );
+}
+
 sub _compose_ui {
     my $self = shift;
 
