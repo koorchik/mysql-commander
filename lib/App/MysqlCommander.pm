@@ -68,7 +68,12 @@ sub _build_dbh {
     my $self = shift;
 
     my $dsn = "DBI:mysql:database=". $self->database .";";
-    my $dbh = DBI->connect($dsn, $self->user, $self->password, {RaiseError =>1});
+    
+    my $dbh = DBI->connect($dsn, $self->user, $self->password, {
+        RaiseError => 1,
+        mysql_enable_utf8 => 1
+    });
+    
     return $dbh;
 }
 
