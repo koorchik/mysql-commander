@@ -8,47 +8,10 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use App::MysqlCommander;
-use App::MysqlCommander::UI;
-
-use DBI;
-use Try::Tiny;
-use Data::Dumper;
 
 main();
 
 sub main {
-    my $ui = App::MysqlCommander::UI->new();
-    
-    $ui->on('select_menu' => sub {
-        my ( $ui, $info_type ) = @_;
-    });
-
-    $ui->on('sql_update' => sub {
-        my ( $ui, $sql ) = @_;
-
-        try {
-            my $data = _execute_query($sql);
-            $ui->update_data($data);
-        } 
-        catch {
-            warn $_;
-        };
-    });
-
-    $ui->run();
-}
-
-
-sub _get_dbh {
-    my $dsn = "DBI:mysql:database=bke;";
-    my $dbh = DBI->connect($dsn, 'root', '', {RaiseError =>1});
-    return $dbh;
-}
-
-
-sub _execute_query {
-    my $sql = shift;
-    state $dbh = _get_dbh();
-
-    return $dbh->selectall_arrayref($sql, { Slice => {} });
+    my $app = App::MysqlCommander->new_with_options();
+    $app->run();
 }

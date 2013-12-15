@@ -30,6 +30,7 @@ has queries => (
         'variables'   => 'SHOW VARIABLES',
         'statictics'  => 'SHOW TABLE STATUS',
         'processlist' => 'SHOW PROCESSLIST',
+        'tables'      => 'SHOW TABLES',
     }}
 );
 
@@ -73,49 +74,6 @@ sub _append_results_viewer {
 
     my $main_window = $self->cui->getobj('main_window');
 
-    my @columns = ({
-        -isid  => 1,
-        -key   => 'user_id',
-        -label => 'User ID'
-    }, 
-    {
-        -key   => 'first_name',
-        -label => 'First Name'
-    },
-    {
-        -key   => 'middle_name',
-        -label => 'Middle Name'
-    },
-    {
-        -key   => 'last_name',
-        -label => 'Last Name'
-    },
-    {
-        -key   => 'email',
-        -label => 'Email'
-    });
-
-    my @rows = ({
-        user_id     => 1,
-        first_name  => 'Vasya',
-        middle_name => 'Vaskin',
-        last_name   => 'Pupkin',
-        email       => 'vasya.email@mail.com'
-    },
-    {
-        user_id     => 2,
-        first_name  => 'Vasya2',
-        middle_name => 'Vaskin2',
-        last_name   => 'Pupkin2',
-        email       => 'vasya.email@mail.com'
-    },
-    {
-        user_id     => 3,
-        first_name  => 'Vasya3',
-        middle_name => 'Vaskin3',
-        last_name   => 'Pupkin3',
-        email       => 'vasya.email@mail.com'
-    });
 
     my $results_table = $main_window->add( 
        'results_table', 'Table',
@@ -125,8 +83,8 @@ sub _append_results_viewer {
         -bg         => 'blue',
         -bbg        => 'blue',
         -fw         => 'white',
-        -columns    => \@columns,
-        -rows       => \@rows,
+        -columns    => [],
+        -rows       => [],
         -padbottom  => 1,
     );
 
@@ -178,6 +136,16 @@ sub _append_main_menu {
                 $self->_execute_query('processlist');
             }
         } ]
+    },
+    { 
+        -label   => 'Database', 
+        -submenu => [ 
+        { 
+            -label => 'Tables', 
+            -value => sub {
+                $self->_execute_query('tables');
+            }  
+        }]
     });
 
     my $menu = $self->cui->add(
