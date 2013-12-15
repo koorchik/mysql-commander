@@ -103,7 +103,7 @@ sub _make_header_text {
     return '' unless @$columns;
 
     my $col_width = int($self->{__table_width}/@$columns);
-    my @labels = map { sprintf( "%-${col_width}s", $_->{-label}) } @$columns;
+    my @labels = map { sprintf( "%-${col_width}.${col_width}s", $_->{-label}) } @$columns;
 
     return join( '|', @labels );
 }
@@ -123,7 +123,7 @@ sub _make_table_listbox {
         my $id = $row->{$id_key};
         
         push @ids, $id;
-        my @values = map { sprintf( "%-${col_width}s", $_ ) } @{$row}{@keys};
+        my @values = map { sprintf( "%-${col_width}.${col_width}s", $_ ) } @{$row}{@keys};
         $labels{$id} = join( '|', @values );
     } 
 
